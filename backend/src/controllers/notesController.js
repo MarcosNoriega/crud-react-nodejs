@@ -29,4 +29,11 @@ notesController.delete = async (req, res) => {
     res.json({mensaje: 'nota eliminada correctamente', note});
 }
 
+notesController.show = async (req, res) => {
+    let {id} = req.params;
+    let note = await Note.findById(id);
+
+    res.json(note);
+}
+
 module.exports = notesController;

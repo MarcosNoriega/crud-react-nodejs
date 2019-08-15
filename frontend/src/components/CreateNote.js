@@ -9,11 +9,24 @@ export default class CreateNote extends Component {
         content: '',
         author: '',
         date: new Date(),
-        users: []
+        users: [],
+        editing: false
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
+        if (this.props.match.params.id){
+            const res = await axios.get(`http://localhost:4000/notes/show/${this.props.match.params.id}`);
+            const note = res.data;
+            this.setState({
+                title: note.title,
+                content: note.content,
+                author: note.author,
+                date: note.date,
+                editing: true
+            })
+        }
+        
         this.getUsers();
     }
 
@@ -36,12 +49,23 @@ export default class CreateNote extends Component {
 
     saveNote = async (e) => {
         e.preventDefault();
-        await axios.post('http://localhost:4000/notes/create', {
+        if (!this.state.editing) {
+            await axios.post('http://localhost:4000/notes/create', {
             title: this.state.title,
             content: this.state.content,
             author: this.state.author,
             date: this.state.date
-        });
+            });
+        } else {
+            await axios.put(`http://localhost:4000/notes/update/${this.props.match.params.id}`, {
+                title: this.state.title,
+                content: this.state.content,
+                author: this.state.author,
+                date: this.state.date
+            });
+        }
+
+        
         
         this.setState({
             title: '',
